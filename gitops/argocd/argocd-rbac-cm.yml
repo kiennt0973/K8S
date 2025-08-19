@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: dev-argo-cd
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: v2.11.3
+    helm.sh/chart: argo-cd-7.1.2
+  annotations:
+    meta.helm.sh/release-name: dev-argo-cd
+    meta.helm.sh/release-namespace: argocd
+data:
+  policy.matchMode: glob
+  scopes: '[groups]'
+  policy.default: role:readonly
+  policy.csv: |
+    p, role:deployment-restart, applications, action/apps/Deployment/restart, default/*, allow
+    p, role:onwer-project, projects, *, ip-marketplace, allow
+
+
+    g, hanli, role:deployment-restart
+    g, natsu, role:deployment-restart
+    g, lucy, role:deployment-restart
+    g, ip-mrkplace, role:onwer-project

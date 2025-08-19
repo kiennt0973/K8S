@@ -1,0 +1,17 @@
+{{- if .Values.pvc.enabled }}
+{{- $fullName := include "template.fullname" . -}}
+{{- $ns := include "template.namespace" . -}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "cephfs-pvc-{{ $fullName }}"
+  namespace: {{ $ns }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.pvc.storage }}
+  storageClassName: "rook-cephfs-{{ $ns }}-{{$fullName}}"
+{{- end }}

@@ -1,0 +1,22 @@
+{{- if .Values.service.enabled }}
+{{- $fullName := include "template.fullname" . -}}
+{{- $ns := include "template.namespace" . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}
+  namespace: {{$ns}}
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP"}}
+  ports:
+    {{- range .Values.service.ports }}
+    - port: {{ .port }}
+      targetPort: {{ .targetPort}}
+      protocol: {{ .protocol | default "TCP" }}
+      name: {{ .namePort }}
+    {{- end }}
+  selector:
+    {{- include "template.selectorLabels" . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,77 @@
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: ${TARGET_DEPLOYMENT}
+#   namespace: $namespace
+#   annotations:
+#     kubernetes.io/change-cause: "image: $k8s_service_name/$tag:$commitid"
+#   labels:
+#     app: k8s-$k8s_service_name
+# spec:
+#   serviceName: $k8s_service_name
+#   replicas: ${default_min_pod}
+#   selector:
+#     matchLabels:
+#       app: ${TARGET_POD_LABEL}
+#   updateStrategy:
+#     type: RollingUpdate
+#     rollingUpdate:
+#       maxUnavailable: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: ${TARGET_POD_LABEL}
+#     spec:
+#       containers:
+#         - name: $k8s_service_name
+#           image: $target_tag
+# ${READINESS_PROBE}  # Placeholder for readinessProbe
+# #          livenessProbe:
+# #            httpGet:
+# #              path: $health_check_path
+# #              port: $container_port
+# #            initialDelaySeconds: 180
+# #            periodSeconds: 30
+# #            failureThreshold: 3
+# #          readinessProbe:
+# #            httpGet:
+# #              path: $health_check_path
+# #              port: $container_port
+# #            initialDelaySeconds: 5
+# #            periodSeconds: 10
+#           env:
+#           - name: TZ
+#             value: Asia/Ho_Chi_Minh
+#           imagePullPolicy: Always
+#           resources:
+#             limits:
+#                cpu: "${cpu_limit}"
+#                memory: ${memory_limit}Mi
+#             requests:
+# #               cpu: "${cpu_request}"
+# #               memory: ${memory_request}Mi
+#                cpu: "0.1"
+#                memory: 500Mi
+#           ports:
+#             - containerPort: $container_port
+#               name: rest
+#             - containerPort: $container_port_1
+#               name: rpc
+#           volumeMounts:
+#             - name: data
+#               mountPath: $mount_path
+#       topologySpreadConstraints:
+#         - maxSkew: 1
+#           topologyKey: kubernetes.io/hostname
+#           whenUnsatisfiable: ScheduleAnyway
+#           labelSelector:
+#             matchLabels:
+#               app: k8s-$k8s_service_name
+
+#       volumes:
+#         - name: data
+#           persistentVolumeClaim:
+#             claimName: cephfs-pvc-${k8s_service_name}
+#             readOnly: false
+#       imagePullSecrets:
+#         - name: harbor-secret-registry

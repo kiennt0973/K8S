@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fe-test
+  namespace: argocd
+  # finalizers:  #### attention: if enable it, please change "resources-finalizer.argocd.argoproj.io" to null when deleting
+  #   - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: ''
+    namespace: ip-marketplace
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: helm-chart-services/services-chart/frontend/fe-test
+    repoURL: 'https://gitlab.tma.com.vn/k8s_tma/gitops.git'
+    targetRevision: HEAD
+    helm:
+      releaseName: fe-test
+  sources: []
+  project: ip-marketplace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+    syncOptions:
+      - PruneLast=true

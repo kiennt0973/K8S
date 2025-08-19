@@ -1,0 +1,52 @@
+{{- if .Values.autoscaling.enabled }}
+{{- $fullName := include "template.fullname" . -}}
+{{- $ns := include "template.namespace" . -}}
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "scale-{{ $fullName }}"
+  namespace: {{ $ns }}
+  labels:
+    {{- include "template.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $fullName }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.autoscaling.targetCPUAverageValue }}
+    - type: Resource
+      resource:
+        name: cpu
+#        targetAverageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.autoscaling.targetCPUAverageValue }}
+    {{- end }}
+    {{- if .Values.autoscaling.targetMemoryAverageValue }}
+    - type: Resource
+      resource:
+        name: memory
+#        targetAverageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.autoscaling.targetMemoryAverageValue }}
+    {{- end }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 10
+      policies:
+      - type: Pods
+        value: 2
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 180
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 15
+{{- end }}
+{{- end }}

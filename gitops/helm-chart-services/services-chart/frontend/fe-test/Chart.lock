@@ -1,0 +1,6 @@
+dependencies:
+- name: templates
+  repository: file://../../../sharing-chart/fe-sharing/fe-test
+  version: 0.1.0
+digest: sha256:b4b2966dcd78a13fef9bfefd1121b4ef4111250b4ab0366bca8431ebc2a2ef8a
+generated: "2025-07-30T15:10:49.599288308+07:00"

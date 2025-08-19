@@ -1,0 +1,148 @@
+# Default values for discovery-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  chartName: discovery-service
+
+templates:  #### value for charts in denpendency
+  deployment:
+    enabled: true
+    replicaCount: 1
+
+    # Overrides the image tag whose default is the chart appVersion.
+  image:
+    repository: 192.168.121.70/ip-marketplace/be/discovery-service
+    tag: develop-572f81f48a
+    pullPolicy: Always
+    ports:
+      - port: 80
+        protocol: TCP
+        namePort: http
+      - port: 81
+        protocol: TCP
+        namePort: rcp  
+
+  service:
+    enabled: true
+    type: ClusterIP
+    ingressPort: 80
+    ports:
+      - port: 80
+        protocol: TCP
+        namePort: http
+        targetPort: 80
+      - port: 81
+        protocol: TCP  
+        namePort: rcp
+        targetPort: 81
+
+
+  imagePullSecrets:
+    - name: harbor-secret-registry
+  nameOverride: ""
+  #fullnameOverride: "" ### default value
+  fullnameOverride: "discovery-service" ### service name
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: false
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  storageClass:
+    enabled: true
+
+  pvc:
+    enabled: true
+    accessModes: ReadWriteMany
+    storage: "1Gi"
+    mountPath: /home
+
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: true
+    hosts:
+      - host: discovery.dev-ipmarketplace.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  healthCheckPod:
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      failureThreshold: 3
+    readinessProbe:
+      enabled: true  
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      failureThreshold: 3
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 75
+    targetCPUAverageValue: 1
+    targetMemoryAverageValue: 700Mi
+    scale:
+      upPolicies:
+        - stabilizationWindowSeconds: 10
+        - type: Pods
+          value: 2
+          periodSeconds: 15
+      downPolicies:
+        - stabilizationWindowSeconds: 180
+        - type: Pods
+          value: 1
+          periodSeconds: 15
+
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
