@@ -1,0 +1,34 @@
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: nginx-gateway
+  namespace: test
+spec:
+  selector:
+    istio: ingress-test  ### label of ingress-istio pod
+  servers:
+    - hosts:
+        - nginx.example.com
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+      tls:
+        mode: PASSTHROUGH
+
+---
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: bookinfo-gateway
+  namespace: test
+spec:
+  selector:
+    istio: ingress-test  ### label of ingress-istio pod
+  servers:
+    - hosts:
+        - 'book.example.com'
+      port:
+        name: http
+        number: 80
+        protocol: HTTP

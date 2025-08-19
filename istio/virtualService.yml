@@ -1,0 +1,48 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: nginx-virtualservice
+  namespace: test
+spec:
+  gateways:
+    - nginx-gateway
+  hosts:
+    - "nginx.example.com"
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: nginx-service
+            port:
+              number: 80
+
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: bookinfo
+  namespace: test
+spec:
+  gateways:
+    - bookinfo-gateway
+  hosts:
+    - "*"
+  http:
+    - match:
+        - uri:
+            exact: /productpage
+        - uri:
+            prefix: /static
+        - uri:
+            exact: /login
+        - uri:
+            exact: /logout
+        - uri:
+            prefix: /api/v1/products
+      route:
+        - destination:
+            host: productpage
+            port:
+              number: 9080

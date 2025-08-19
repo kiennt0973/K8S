@@ -1,0 +1,7 @@
+1. selector in Gateway istio is label of ingress pod
+2. mTLS
+a. security.istio
+- PeerAuthentication
+- pod A can curl to pod B via dns of service B
+- if you curl from inside pod A to pod B, it always route traffic via "service of pod B" or "intercepting by something in istio components" to check envoy porxy on 2 pod can connect each other
+3. envoy filter (gzip static file)
